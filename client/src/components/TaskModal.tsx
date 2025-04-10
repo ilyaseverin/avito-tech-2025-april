@@ -214,14 +214,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
               <MenuItem value="">Нет доступных проектов</MenuItem>
             )}
           </Select>
-          {boardsLoading && (
-            <Typography
-              variant="caption"
-              sx={{ display: "block", mt: 1, textAlign: "center" }}
-            >
-              Загрузка...
-            </Typography>
-          )}
         </FormControl>
 
         {/* Приоритет */}

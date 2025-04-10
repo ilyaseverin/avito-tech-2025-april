@@ -1,6 +1,6 @@
 // src/components/TaskModal.tsx
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Modal,
   Box,
@@ -25,33 +25,16 @@ import type {
   CreateTaskRequest,
   UpdateTaskRequest,
 } from "../types/models";
+import { useTaskDraft, TaskDraft } from "../hooks/useTaskDraft";
 
 interface TaskModalProps {
   open: boolean;
   onClose: () => void;
-  /** Если передан taskId, значит редактируем задачу, иначе создаём */
   taskId?: number;
-  /**
-   * Если модалка вызывается со страницы доски,
-   * передаём defaultBoardId для предзаполнения.
-   */
   defaultBoardId?: number;
-  /**
-   * Флаг блокировки поля "Проект": при редактировании поле блокируется,
-   * а при создании — нет.
-   */
   isBoardLocked?: boolean;
-  /**
-   * Нужно ли отображать кнопку "Перейти на доску"?
-   */
   showGoToBoardButton?: boolean;
-  /**
-   * Коллбэк при нажатии "Перейти на доску"
-   */
   onGoToBoard?: (boardId: number) => void;
-  /**
-   * Если создаёте задачу из списка задач (IssuesPage), передаётся реальный boardId.
-   */
   forcedBoardId?: number;
 }
 
@@ -65,28 +48,56 @@ const TaskModal: React.FC<TaskModalProps> = ({
   showGoToBoardButton = false,
   onGoToBoard,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState<Priority>("Medium");
-  const [status, setStatus] = useState<Status>("Backlog");
-  // Используем строковое состояние для поля проекта, чтобы select корректно работал
-  const [boardValue, setBoardValue] = useState<string>(
-    defaultBoardId ? defaultBoardId.toString() : ""
-  );
-  const [assigneeValue, setAssigneeValue] = useState<string>("");
+  const isEditMode = Boolean(taskId);
 
-  // Загружаем данные задачи, если taskId задан (редактирование)
-  const { data: fetchedTask } = useGetTaskByIdQuery(taskId!, {
-    skip: !taskId,
-  });
+  // Мемоизируем изначальный draft, чтобы не пересоздавать объект:
+  const initialDraft = useMemo<TaskDraft>(
+    () => ({
+      title: "",
+      description: "",
+      priority: "Medium",
+      boardValue: defaultBoardId ? defaultBoardId.toString() : "",
+      assigneeValue: "",
+    }),
+    [defaultBoardId]
+  );
+
+  const { draft, setDraft, clearDraft } = useTaskDraft(
+    "newTaskDraft",
+    initialDraft
+  );
+
+  // Состояния для полей:
+  const [title, setTitle] = useState(isEditMode ? "" : draft.title);
+  const [description, setDescription] = useState(
+    isEditMode ? "" : draft.description
+  );
+  const [priority, setPriority] = useState<Priority>(
+    isEditMode ? "Medium" : draft.priority
+  );
+  const [status, setStatus] = useState<Status>("Backlog");
+  const [boardValue, setBoardValue] = useState<string>(
+    isEditMode
+      ? defaultBoardId
+        ? defaultBoardId.toString()
+        : ""
+      : draft.boardValue
+  );
+  const [assigneeValue, setAssigneeValue] = useState<string>(
+    isEditMode ? "" : draft.assigneeValue
+  );
+
+  // Данные с сервера
+  const { data: fetchedTask } = useGetTaskByIdQuery(taskId!, { skip: !taskId });
   const { data: boards, isLoading: boardsLoading } = useGetBoardsQuery();
   const { data: users, isLoading: usersLoading } = useGetUsersQuery();
 
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
 
+  // Заполняем поля из API при редактировании
   useEffect(() => {
-    if (taskId && fetchedTask) {
+    if (isEditMode && fetchedTask) {
       setTitle(fetchedTask.title);
       setDescription(fetchedTask.description);
       setPriority(fetchedTask.priority);
@@ -103,19 +114,66 @@ const TaskModal: React.FC<TaskModalProps> = ({
       } else {
         setBoardValue("");
       }
-    } else if (!taskId && defaultBoardId) {
-      // Режим создания: если defaultBoardId передан, устанавливаем его
+    } else if (!isEditMode && defaultBoardId) {
+      // Создание: если есть defaultBoardId, выставляем его
       setBoardValue(defaultBoardId.toString());
     }
-  }, [taskId, fetchedTask, defaultBoardId, forcedBoardId, boards]);
+  }, [isEditMode, fetchedTask, defaultBoardId, forcedBoardId, boards]);
+
+  // Сохраняем в черновик при создании задачи
+  useEffect(() => {
+    if (!isEditMode) {
+      const newDraft: TaskDraft = {
+        title,
+        description,
+        priority,
+        boardValue,
+        assigneeValue,
+      };
+      if (JSON.stringify(draft) !== JSON.stringify(newDraft)) {
+        setDraft(newDraft);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isEditMode,
+    title,
+    description,
+    priority,
+    boardValue,
+    assigneeValue,
+    setDraft,
+  ]);
+
+  // Если boardValue не найден в boards — сбрасываем его. Аналогично для assigneeValue и users
+  useEffect(() => {
+    if (!isEditMode) {
+      // Только если создаем
+      if (boards && boards.length > 0 && boardValue) {
+        const availableBoardIds = boards.map((b) => b.id.toString());
+        if (!availableBoardIds.includes(boardValue)) {
+          setBoardValue("");
+        }
+      }
+      if (users && users.length > 0 && assigneeValue) {
+        const availableUserIds = users.map((u) => u.id.toString());
+        if (!availableUserIds.includes(assigneeValue)) {
+          setAssigneeValue("");
+        }
+      }
+    }
+  }, [isEditMode, boards, boardValue, users, assigneeValue]);
 
   const handleSubmit = async () => {
-    if (!title || !description) return;
-
+    if (!title.trim() || !description.trim()) {
+      console.warn("Заполните поля 'Название задачи' и 'Описание'");
+      return;
+    }
     const boardIdNum = boardValue ? parseInt(boardValue) : 0;
     const assigneeIdNum = assigneeValue ? parseInt(assigneeValue) : 0;
     try {
-      if (taskId) {
+      if (isEditMode && taskId) {
+        // Редактирование
         const payload: UpdateTaskRequest = {
           title,
           description,
@@ -125,6 +183,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
         };
         await updateTask({ taskId, data: payload }).unwrap();
       } else {
+        // Создание
         if (!boardIdNum) {
           console.warn("Не выбран проект (boardId)!");
           return;
@@ -137,6 +196,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           assigneeId: assigneeIdNum,
         };
         await createTask(payload).unwrap();
+        clearDraft(); // очистка черновика
       }
       onClose();
     } catch (error) {
@@ -152,7 +212,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   if (!open) return null;
 
-  const isEditMode = Boolean(taskId);
   const modalTitle = isEditMode ? "Редактирование задачи" : "Создание задачи";
 
   const style = {
@@ -200,7 +259,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <Select
             labelId="board-label"
             label="Проект (Доска)"
-            value={boardValue}
+            value={boardsLoading ? "" : boardValue}
             onChange={(e) => setBoardValue(e.target.value as string)}
             disabled={isBoardLocked || boardsLoading}
           >
@@ -254,7 +313,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <Select
             labelId="assignee-label"
             label="Исполнитель"
-            value={assigneeValue}
+            value={usersLoading ? "" : assigneeValue}
             onChange={(e) => setAssigneeValue(e.target.value as string)}
           >
             {users?.length ? (
@@ -267,17 +326,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
               <MenuItem value="">Нет данных</MenuItem>
             )}
           </Select>
-          {usersLoading && (
-            <Typography
-              variant="caption"
-              sx={{ display: "block", mt: 1, textAlign: "center" }}
-            >
-              Загрузка...
-            </Typography>
-          )}
         </FormControl>
 
-        {/* Кнопка "Перейти на доску" */}
         {showGoToBoardButton && boardValue && (
           <Button variant="outlined" onClick={handleGoToBoard} sx={{ mt: 1 }}>
             Перейти на доску

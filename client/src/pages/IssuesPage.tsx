@@ -1,52 +1,133 @@
+// src/pages/Issues/IssuesPage.tsx
+
 import React, { useState } from "react";
-import { Box, Card, CardContent, Typography, TextField } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useGetAllTasksQuery } from "../api/baseApi";
-import type { GetTasksResponse } from "../types/models";
+import { useGetAllTasksQuery, useGetBoardsQuery } from "../api/baseApi";
+import type { GetTasksResponse, GetBoardsResponse } from "../types/models";
 import TaskModal from "../components/TaskModal";
+import { useDebounce } from "../hooks/useDebounce"; // ваш хук debounce
 
 const IssuesPage: React.FC = () => {
   const { data: tasks, isLoading, isError } = useGetAllTasksQuery();
+  const { data: boards } = useGetBoardsQuery();
   const [selectedTask, setSelectedTask] = useState<GetTasksResponse | null>(
     null
   );
-  const [search, setSearch] = useState("");
+
+  // Состояния фильтров
+  const [rawSearchText, setRawSearchText] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("Все");
+  // Фильтр по названию доски (а не по boardId)
+  const [filterBoard, setFilterBoard] = useState<string>("Все");
+
+  // Дебаунсированное значение для поля поиска
+  const searchText = useDebounce(rawSearchText, 300);
+
   const navigate = useNavigate();
 
   if (isLoading) return <div>Загрузка задач...</div>;
   if (isError) return <div>Ошибка при загрузке задач</div>;
   if (!tasks) return null;
 
-  // Поиск
-  const filteredTasks = tasks.filter((t) =>
-    t.title.toLowerCase().includes(search.toLowerCase())
-  );
+  // Фильтрация задач:
+  // - По статусу (Backlog, InProgress, Done, «Все»)
+  // - По названию доски (task.boardName против filterBoard)
+  // - Поиск: начинается только при длине searchText >= 3, иначе пропускаем
+  //   поиск, т.е. matchesSearch = true
+  const filteredTasks = tasks.filter((task) => {
+    // Фильтр по статусу
+    const matchesStatus =
+      filterStatus === "Все" || task.status === filterStatus;
 
-  // При клике сохраняем ВЕСЬ объект, чтобы иметь и .id, и .boardId
+    // Фильтр по названию доски
+    const matchesBoard =
+      filterBoard === "Все" || task.boardName === filterBoard;
+
+    // Поиск по названию задачи и исполнителю
+    // Если строка поиска короче 3 символов – игнорируем поиск, matchesSearch = true
+    const lowerSearch = searchText.toLowerCase();
+    const matchesSearch =
+      searchText.length < 3
+        ? true
+        : task.title.toLowerCase().includes(lowerSearch) ||
+          task.assignee.fullName.toLowerCase().includes(lowerSearch);
+
+    return matchesStatus && matchesBoard && matchesSearch;
+  });
+
+  // При клике на карточку задачи -> открываем TaskModal
   const handleCardClick = (task: GetTasksResponse) => {
     setSelectedTask(task);
   };
 
-  // Переход к доске
+  // Переход на страницу доски
   const handleGoToBoard = (boardId: number) => {
     navigate(`/board/${boardId}`);
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h4" gutterBottom>
         Все задачи
       </Typography>
 
-      <Box sx={{ mb: 2 }}>
+      {/* Блок фильтров */}
+      <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
+        {/* Поле поиска (дебаунс) */}
         <TextField
-          label="Поиск по названию задачи"
+          label="Поиск по задаче/исполнителю"
           variant="outlined"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={rawSearchText}
+          onChange={(e) => setRawSearchText(e.target.value)}
         />
+
+        {/* Фильтр по статусу */}
+        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+          <InputLabel id="status-filter-label">Статус</InputLabel>
+          <Select
+            labelId="status-filter-label"
+            label="Статус"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <MenuItem value="Все">Все</MenuItem>
+            <MenuItem value="Backlog">Backlog</MenuItem>
+            <MenuItem value="InProgress">InProgress</MenuItem>
+            <MenuItem value="Done">Done</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Фильтр по названию доски */}
+        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+          <InputLabel id="board-filter-label">Доска</InputLabel>
+          <Select
+            labelId="board-filter-label"
+            label="Доска"
+            value={filterBoard}
+            onChange={(e) => setFilterBoard(e.target.value)}
+          >
+            <MenuItem value="Все">Все</MenuItem>
+            {boards?.map((b: GetBoardsResponse) => (
+              <MenuItem key={b.id} value={b.name}>
+                {b.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
+      {/* Список задач */}
       {filteredTasks.map((task) => (
         <Card
           key={task.id}
@@ -64,15 +145,12 @@ const IssuesPage: React.FC = () => {
         </Card>
       ))}
 
-      {/* При выбранной задаче открываем общий TaskModal */}
+      {/* Модальное окно для редактирования задачи */}
       {selectedTask && (
         <TaskModal
           open={Boolean(selectedTask)}
           onClose={() => setSelectedTask(null)}
-          // Редактируем задачу с этим ID
           taskId={selectedTask.id}
-          // И САМОЕ ВАЖНОЕ — передаём boardId,
-          //  т.к. /tasks/{taskId} вернёт только boardName
           forcedBoardId={selectedTask.boardId}
           showGoToBoardButton={true}
           onGoToBoard={handleGoToBoard}

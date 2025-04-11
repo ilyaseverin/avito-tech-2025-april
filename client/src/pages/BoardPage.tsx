@@ -12,7 +12,6 @@ import TaskModal from "../components/TaskModal";
 import Columns from "../components/Columns";
 
 const BoardPage: React.FC = () => {
-  console.log("render");
   const { id } = useParams();
   const boardId = Number(id);
 
@@ -48,7 +47,7 @@ const BoardPage: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h4" gutterBottom>
         {thisBoard
           ? `Проект: ${thisBoard.name}`

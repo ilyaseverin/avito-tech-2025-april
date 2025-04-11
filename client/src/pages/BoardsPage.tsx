@@ -12,7 +12,7 @@ const BoardsPage: React.FC = () => {
   if (isError) return <div>Ошибка при загрузке досок</div>;
 
   return (
-    <Box>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h4" gutterBottom>
         Все доски
       </Typography>
@@ -20,19 +20,23 @@ const BoardsPage: React.FC = () => {
       {boards?.map((board) => (
         <Card key={board.id} sx={{ mb: 2 }}>
           <CardContent>
-            <Typography variant="h6">{board.name}</Typography>
-            <Typography variant="body2">{board.description}</Typography>
-            <Typography variant="body2">
-              Количество задач: {board.taskCount}
-            </Typography>
-            <Button
-              component={Link}
-              to={`/board/${board.id}`}
-              variant="outlined"
-              sx={{ mt: 1 }}
-            >
-              Перейти к доске
-            </Button>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box>
+                <Typography variant="h6">{board.name}</Typography>
+                <Typography variant="body2">{board.description}</Typography>
+                <Typography variant="body2">
+                  Количество задач: {board.taskCount}
+                </Typography>
+              </Box>
+              <Button
+                component={Link}
+                to={`/board/${board.id}`}
+                variant="outlined"
+                sx={{ ml: "auto" }}
+              >
+                Перейти к доске
+              </Button>
+            </Box>
           </CardContent>
         </Card>
       ))}

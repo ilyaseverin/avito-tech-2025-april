@@ -8,11 +8,13 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
+import CssBaseline from "@mui/material/CssBaseline";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <BrowserRouter>
           <App />
         </BrowserRouter>

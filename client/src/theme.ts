@@ -6,7 +6,7 @@ const theme = createTheme({
       main: "#1976d2", // синий по умолчанию
     },
     secondary: {
-      main: "#9c27b0",
+      main: "#ffffff",
     },
   },
   // Прочие настройки темы

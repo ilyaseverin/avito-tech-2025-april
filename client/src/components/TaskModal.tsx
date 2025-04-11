@@ -282,11 +282,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
           />
 
           {/* Кнопка "Перейти на доску", если нужно */}
-          {showGoToBoardButton && boardValue && (
-            <Button variant="outlined" onClick={handleGoToBoard} sx={{ mt: 1 }}>
-              Перейти на доску
-            </Button>
-          )}
 
           {/* Кнопки "Создать/Обновить" и "Отмена" */}
           <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
@@ -300,6 +295,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
             <Button variant="outlined" onClick={onClose}>
               Отмена
             </Button>
+            <Box sx={{ flexGrow: 1 }} />
+            {showGoToBoardButton && boardValue && (
+              <Button variant="outlined" onClick={handleGoToBoard}>
+                Перейти на доску
+              </Button>
+            )}
           </Box>
         </Box>
       </FormProvider>

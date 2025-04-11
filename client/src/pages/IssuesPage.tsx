@@ -81,50 +81,56 @@ const IssuesPage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Все задачи
       </Typography>
-
-      {/* Блок фильтров */}
-      <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
-        {/* Поле поиска (дебаунс) */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 2,
+          gap: 2,
+          flexWrap: "wrap",
+        }}
+      >
         <TextField
           label="Поиск по задаче/исполнителю"
           variant="outlined"
           value={rawSearchText}
           onChange={(e) => setRawSearchText(e.target.value)}
+          sx={{ flex: "1 1 300px" }}
         />
-
-        {/* Фильтр по статусу */}
-        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-          <InputLabel id="status-filter-label">Статус</InputLabel>
-          <Select
-            labelId="status-filter-label"
-            label="Статус"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <MenuItem value="Все">Все</MenuItem>
-            <MenuItem value="Backlog">Backlog</MenuItem>
-            <MenuItem value="InProgress">InProgress</MenuItem>
-            <MenuItem value="Done">Done</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* Фильтр по названию доски */}
-        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-          <InputLabel id="board-filter-label">Доска</InputLabel>
-          <Select
-            labelId="board-filter-label"
-            label="Доска"
-            value={filterBoard}
-            onChange={(e) => setFilterBoard(e.target.value)}
-          >
-            <MenuItem value="Все">Все</MenuItem>
-            {boards?.map((b: GetBoardsResponse) => (
-              <MenuItem key={b.id} value={b.name}>
-                {b.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          {/* Фильтр по статусу */}
+          <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+            <InputLabel id="status-filter-label">Статус</InputLabel>
+            <Select
+              labelId="status-filter-label"
+              label="Статус"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <MenuItem value="Все">Все</MenuItem>
+              <MenuItem value="Backlog">Backlog</MenuItem>
+              <MenuItem value="InProgress">InProgress</MenuItem>
+              <MenuItem value="Done">Done</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+            <InputLabel id="board-filter-label">Доска</InputLabel>
+            <Select
+              labelId="board-filter-label"
+              label="Доска"
+              value={filterBoard}
+              onChange={(e) => setFilterBoard(e.target.value)}
+            >
+              <MenuItem value="Все">Все</MenuItem>
+              {boards?.map((b: GetBoardsResponse) => (
+                <MenuItem key={b.id} value={b.name}>
+                  {b.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
 
       {/* Список задач */}
@@ -144,8 +150,6 @@ const IssuesPage: React.FC = () => {
           </CardContent>
         </Card>
       ))}
-
-      {/* Модальное окно для редактирования задачи */}
       {selectedTask && (
         <TaskModal
           open={Boolean(selectedTask)}

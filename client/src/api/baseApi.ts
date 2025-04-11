@@ -54,7 +54,7 @@ export const baseApi = createApi({
     getTaskById: builder.query<GetTaskByIDResponse, number>({
       query: (taskId) => `/tasks/${taskId}`,
       transformResponse: (raw: { data: GetTaskByIDResponse }) => raw.data,
-      providesTags: (result, error, arg) => [{ type: "Tasks", id: arg }],
+      providesTags: (_result, _error, arg) => [{ type: "Tasks", id: arg }],
     }),
 
     /** Создать задачу (POST /tasks/create) */
@@ -77,7 +77,7 @@ export const baseApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, arg) => [
+      invalidatesTags: (_result, _error, arg) => [
         { type: "Tasks", id: arg.taskId },
         "Tasks",
       ],
@@ -93,7 +93,7 @@ export const baseApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, arg) => [
+      invalidatesTags: (_result, _error, arg) => [
         { type: "Tasks", id: arg.taskId },
         "Tasks",
       ],

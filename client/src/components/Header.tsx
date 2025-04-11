@@ -1,45 +1,62 @@
+// src/components/Header.tsx
+
 import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
-import { Link, useMatch } from "react-router-dom";
+import { AppBar, Toolbar, Button, Box, Tabs, Tab } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 import TaskModal from "./TaskModal";
 
 const Header: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
+  const location = useLocation();
 
-  // Проверяем, совпадает ли текущий роут с /board/:boardId
-  const boardMatch = useMatch("/board/:boardId");
-  const boardId = boardMatch ? Number(boardMatch.params.boardId) : null;
+  // Определяем активную вкладку: если путь начинается с /issues – это вкладка "Все задачи",
+  // если с /boards или /board/ – вкладка "Доски".
+  let currentTab = "";
+  if (location.pathname.startsWith("/issues")) {
+    currentTab = "/issues";
+  } else if (
+    location.pathname.startsWith("/boards") ||
+    location.pathname.startsWith("/board/")
+  ) {
+    currentTab = "/boards";
+  }
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="sticky">
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Project Management
-          </Typography>
-
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button component={Link} to="/boards" color="inherit">
-              Доски
-            </Button>
-            <Button component={Link} to="/issues" color="inherit">
-              Все задачи
-            </Button>
-            <Button color="inherit" onClick={() => setOpenModal(true)}>
-              Создать задачу
-            </Button>
-          </Box>
+          {/* Вкладки размещены слева */}
+          <Tabs
+            value={currentTab}
+            textColor="inherit"
+            indicatorColor="secondary"
+          >
+            <Tab label="Доски" value="/boards" component={Link} to="/boards" />
+            <Tab
+              label="Все задачи"
+              value="/issues"
+              component={Link}
+              to="/issues"
+            />
+          </Tabs>
+          <Box sx={{ flexGrow: 1 }} /> {/* Растягивающийся spacer */}
+          {/* Кнопка создания задачи остается справа */}
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => setOpenModal(true)}
+          >
+            Создать задачу
+          </Button>
         </Toolbar>
       </AppBar>
 
-      {/* Модалка для СОЗДАНИЯ задачи */}
+      {/* Модальное окно для создания задачи */}
       {openModal && (
         <TaskModal
           open={openModal}
           onClose={() => setOpenModal(false)}
-          // Без taskId => точно создаём
-          // Если мы на /board/:boardId, подставим boardId, НО не блокируем
-          defaultBoardId={boardId ?? undefined}
+          // Если вы на странице доски, можно передать defaultBoardId здесь
           isBoardLocked={false}
           showGoToBoardButton={false}
         />

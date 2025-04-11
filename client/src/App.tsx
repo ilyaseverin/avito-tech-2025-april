@@ -1,16 +1,19 @@
+/* eslint-disable react/react-in-jsx-scope */
 /**
- * @file App.tsx
- * @description Корневой компонент приложения: роутинг по страницам.
+ * # App.tsx
+ * Корневой компонент приложения: роутинг по страницам.
+ *
+ * @packageDocumentation
  */
 
 import { Routes, Route } from "react-router-dom";
 import { Container } from "@mui/material";
 
 import Header from "./components/Header";
-import BoardsPage from "./pages/BoardsPage";
-import BoardPage from "./pages/BoardPage";
-import IssuesPage from "./pages/IssuesPage";
-import NotFoundPage from "./pages/NotFoundPage";
+import { BoardsPage } from "./pages/BoardsPage";
+import { BoardPage } from "./pages/BoardPage";
+import { IssuesPage } from "./pages/IssuesPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 function App() {
   return (

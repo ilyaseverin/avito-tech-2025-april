@@ -1,6 +1,8 @@
 /**
- * @file theme.ts
- * @description Создание MUI темы для цветовых настроек.
+ * # theme.ts
+ * Создание MUI темы для цветовых настроек.
+ *
+ * @packageDocumentation
  */
 
 import { createTheme } from "@mui/material/styles";
@@ -8,13 +10,13 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976d2", // Синий по умолчанию
+      main: "#1976d2",
     },
     secondary: {
-      main: "#ffffff", // Белый
+      main: "#ffffff",
     },
     info: {
-      main: "#d14b02", // Цвет для кнопки "Создать задачу"
+      main: "#d14b02", // Оранжеватый цвет для кнопки "Создать задачу"
     },
   },
 });

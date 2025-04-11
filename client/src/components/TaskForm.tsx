@@ -1,6 +1,8 @@
 /**
- * @file TaskForm.tsx
- * @description Универсальная форма для создания / редактирования задачи, использует React Hook Form.
+ * # TaskForm.tsx
+ * Универсальная форма для создания / редактирования задачи, использует React Hook Form.
+ *
+ * @packageDocumentation
  */
 
 import React from "react";
@@ -11,45 +13,8 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import type { Priority, Status } from "../types/models";
-import type { TaskFormData } from "../types/formTypes";
-
-interface Board {
-  id: number;
-  name: string;
-}
-
-interface User {
-  id: number;
-  fullName: string;
-}
-
-interface TaskFormProps {
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-  description: string;
-  setDescription: React.Dispatch<React.SetStateAction<string>>;
-  priority: Priority;
-  setPriority: React.Dispatch<React.SetStateAction<Priority>>;
-  status?: Status;
-  setStatus?: React.Dispatch<React.SetStateAction<Status>>;
-  boardValue: string;
-  setBoardValue: React.Dispatch<React.SetStateAction<string>>;
-  assigneeValue: string;
-  setAssigneeValue: React.Dispatch<React.SetStateAction<string>>;
-
-  isEditMode: boolean;
-  isBoardLocked: boolean;
-
-  boards?: Board[];
-  boardsLoading: boolean;
-  users?: User[];
-  usersLoading: boolean;
-
-  register: UseFormRegister<TaskFormData>;
-  errors: FieldErrors<TaskFormData>;
-}
+import { TaskFormProps } from "../types/interfaces";
 
 const TaskForm: React.FC<TaskFormProps> = ({
   title,

@@ -30,7 +30,7 @@ func NewCreateTaskHandler(db DBInterface) Handler {
 
 // CreateTask обрабатывает запрос на создание новой задачи
 // @Summary Создать новую задачу
-// @Description Создает новую задачу с указанными параметрами
+//  Создает новую задачу с указанными параметрами
 // @Tags Задачи
 // @Accept  json
 // @Produce  json

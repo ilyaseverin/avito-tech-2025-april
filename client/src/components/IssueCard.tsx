@@ -1,17 +1,17 @@
 /**
- * @file IssuesCard.tsx
- * @description Компонент для отображения карточке задач на странице IssuesPage.tsx
+ * # IssueCard.tsx
+ * Компонент для отображения карточки задачи на странице IssuesPage.tsx
+ *
+ * @packageDocumentation
  */
 
 import React from "react";
 import { Card, CardActionArea, CardContent, Typography } from "@mui/material";
-import type { GetTasksResponse } from "../types/models";
+import { IssueCardProps } from "../types/interfaces";
 
-interface IssueCardProps {
-  task: GetTasksResponse;
-  onClick: (task: GetTasksResponse) => void;
-}
-
+/**
+ * Отображает карточку задачи для страницы IssuesPage.
+ */
 const IssueCard: React.FC<IssueCardProps> = ({ task, onClick }) => {
   return (
     <Card
@@ -47,4 +47,4 @@ const IssueCard: React.FC<IssueCardProps> = ({ task, onClick }) => {
   );
 };
 
-export default IssueCard;
+export default React.memo(IssueCard);

@@ -1,17 +1,17 @@
 /**
- * @file DraggableCard.tsx
- * @description Одиночная задача-карточка, которую можно перетаскивать (Drag & Drop).
+ * # DraggableCard.tsx
+ * Одиночная задача-карточка, которую можно перетаскивать (Drag & Drop).
+ *
+ * @packageDocumentation
  */
 
 import React from "react";
 import { Card, CardContent, Typography, CardActionArea } from "@mui/material";
-import type { GetTasksOnBoardResponse } from "../types/models";
+import { DraggableCardProps } from "../types/interfaces";
 
-interface DraggableCardProps {
-  task: GetTasksOnBoardResponse;
-  onCardClick: (task: GetTasksOnBoardResponse) => void;
-}
-
+/**
+ * Карточка задачи, поддерживающая drag&drop и клик.
+ */
 const DraggableCard: React.FC<DraggableCardProps> = ({ task, onCardClick }) => {
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData(
@@ -51,4 +51,4 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ task, onCardClick }) => {
   );
 };
 
-export default DraggableCard;
+export default React.memo(DraggableCard);

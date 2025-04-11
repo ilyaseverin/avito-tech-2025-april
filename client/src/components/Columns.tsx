@@ -1,22 +1,16 @@
 /**
- * @file Columns.tsx
- * @description Компонент для отображения задач в колонках (Backlog, InProgress, Done).
+ * # Columns.tsx
+ * Компонент для отображения задач в колонках (Backlog, InProgress, Done).
+ *
+ * @packageDocumentation
  */
 
 import React, { useState, useCallback } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import DraggableCard from "./DraggableCard";
-import type { GetTasksOnBoardResponse } from "../types/models";
+import { ColumnsProps } from "../types/interfaces";
 
 type ColumnStatus = "Backlog" | "InProgress" | "Done";
-
-interface ColumnsProps {
-  backlog: GetTasksOnBoardResponse[];
-  inProgress: GetTasksOnBoardResponse[];
-  done: GetTasksOnBoardResponse[];
-  onCardClick: (task: GetTasksOnBoardResponse) => void;
-  onStatusChange: (taskId: number, newStatus: ColumnStatus) => void;
-}
 
 const Columns: React.FC<ColumnsProps> = ({
   backlog,

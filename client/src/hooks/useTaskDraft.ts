@@ -1,6 +1,8 @@
 /**
- * @file useTaskDraft.ts
- * @description Хук для сохранения черновика задачи в localStorage.
+ * # useTaskDraft.ts
+ * Хук для сохранения черновика задачи в localStorage.
+ *
+ * @packageDocumentation
  */
 
 import { useState, useEffect } from "react";
@@ -15,10 +17,10 @@ export interface TaskDraft {
 }
 
 /**
- * Хук useTaskDraft сохраняет / читает из localStorage черновик задачи
- * @param key ключ хранения
- * @param initialValue начальное значение
- * @returns { draft, setDraft, clearDraft }
+ * Хук для сохранения/чтения черновика задачи из localStorage.
+ *
+ * @param key Ключ для localStorage
+ * @param initialValue Начальное значение
  */
 export function useTaskDraft(
   key: string,

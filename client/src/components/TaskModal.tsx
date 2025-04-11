@@ -1,6 +1,8 @@
 /**
- * @file TaskModal.tsx
- * @description Модальное окно для создания / редактирования задачи. Поддерживает черновик.
+ * # TaskModal.tsx
+ * Модальное окно для создания / редактирования задачи. Поддерживает черновик.
+ *
+ * @packageDocumentation
  */
 
 import React, { useEffect, useState, useMemo } from "react";
@@ -27,18 +29,7 @@ import type {
 import { useTaskDraft, TaskDraft } from "../hooks/useTaskDraft";
 import TaskForm from "./TaskForm";
 import { useForm, FormProvider } from "react-hook-form";
-import type { TaskFormData } from "../types/formTypes";
-
-interface TaskModalProps {
-  open: boolean;
-  onClose: () => void;
-  taskId?: number;
-  defaultBoardId?: number;
-  isBoardLocked?: boolean;
-  showGoToBoardButton?: boolean;
-  onGoToBoard?: (boardId: number) => void;
-  forcedBoardId?: number;
-}
+import type { TaskFormData, TaskModalProps } from "../types/interfaces";
 
 const TaskModal: React.FC<TaskModalProps> = ({
   open,

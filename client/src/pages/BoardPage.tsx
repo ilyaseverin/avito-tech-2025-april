@@ -1,6 +1,8 @@
 /**
- * @file BoardPage.tsx
- * @description Страница конкретной доски (Backlog, InProgress, Done) с Drag & Drop.
+ * # BoardPage.tsx
+ * Страница конкретной доски (Backlog, InProgress, Done) с Drag & Drop.
+ *
+ * @packageDocumentation
  */
 
 import React, { useState } from "react";
@@ -15,11 +17,10 @@ import type { GetTasksOnBoardResponse } from "../types/models";
 import TaskModal from "../components/TaskModal";
 import Columns from "../components/Columns";
 
-const BoardPage: React.FC = () => {
+export const BoardPage: React.FC = () => {
   const { id } = useParams();
   const boardId = Number(id);
 
-  // Запросы на задачи доски и список досок
   const {
     data: tasks,
     isLoading: isLoadingTasks,
@@ -93,5 +94,3 @@ const BoardPage: React.FC = () => {
     </Box>
   );
 };
-
-export default BoardPage;

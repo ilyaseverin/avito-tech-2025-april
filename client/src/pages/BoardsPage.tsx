@@ -1,6 +1,8 @@
 /**
- * @file BoardsPage.tsx
- * @description Страница со списком всех досок. При нажатии — переход на конкретную доску.
+ * # BoardsPage.tsx
+ * Страница со списком всех досок. При нажатии — переход на конкретную доску.
+ *
+ * @packageDocumentation
  */
 
 import React from "react";
@@ -15,7 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { useGetBoardsQuery } from "../api/baseApi";
 
-const BoardsPage: React.FC = () => {
+export const BoardsPage: React.FC = () => {
   const { data: boards, isLoading, isError } = useGetBoardsQuery();
 
   if (isLoading) {
@@ -61,5 +63,3 @@ const BoardsPage: React.FC = () => {
     </Box>
   );
 };
-
-export default BoardsPage;

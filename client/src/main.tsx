@@ -1,6 +1,8 @@
 /**
- * @file main.tsx
- * @description Точка входа в React-приложение. Подключаем Redux, MUI, Router.
+ * # main.tsx
+ * Точка входа в React-приложение. Подключаем Redux, MUI, Router.
+ *
+ * @packageDocumentation
  */
 
 import React from "react";

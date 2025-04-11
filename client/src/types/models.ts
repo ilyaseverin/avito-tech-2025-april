@@ -1,6 +1,8 @@
 /**
- * @file models.ts
- * @description Общие типы (интерфейсы) для данных, которые возвращает API.
+ * # models.ts
+ * Общие типы (интерфейсы) для данных, которые возвращает API.
+ *
+ * @packageDocumentation
  */
 
 export type Priority = "Low" | "Medium" | "High";

@@ -1,6 +1,8 @@
 /**
- * @file store.ts
- * @description Конфигурирование Redux store с RTK Query.
+ * # store.ts
+ * Конфигурирование Redux store с RTK Query.
+ *
+ * @packageDocumentation
  */
 
 import { configureStore } from "@reduxjs/toolkit";
@@ -14,6 +16,5 @@ export const store = configureStore({
     getDefaultMiddleware().concat(baseApi.middleware),
 });
 
-// Типизация
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -1,15 +1,17 @@
 /**
- * @file useDebounce.ts
- * @description Хук для задержки (debounce) значения с заданной задержкой (по умолчанию 300 мс).
+ * # useDebounce.ts
+ * Хук для задержки (debounce) значения (по умолчанию 300 мс).
+ *
+ * @packageDocumentation
  */
 
 import { useState, useEffect } from "react";
 
 /**
- * Хук useDebounce возвращает "дебаунсированное" значение
+ * Возвращает дебаунсированное значение.
+ *
  * @param value Исходное значение
- * @param delay Задержка в мс (по умолчанию 300)
- * @returns Дебаунсированное значение
+ * @param delay Задержка в мс
  */
 export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);

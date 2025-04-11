@@ -1,6 +1,8 @@
 /**
- * @file Header.tsx
- * @description Верхняя панель с вкладками навигации (Доски / Все задачи) + кнопка "Создать задачу".
+ * # Header.tsx
+ * Верхняя панель с вкладками навигации (Доски / Все задачи) + кнопка "Создать задачу".
+ *
+ * @packageDocumentation
  */
 
 import React, { useState } from "react";
@@ -67,4 +69,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default React.memo(Header);

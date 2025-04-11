@@ -1,6 +1,8 @@
 /**
- * @file baseApi.ts
- * @description RTK Query конфигурация: запросы к серверу (http://localhost:8080/api/v1).
+ * # baseApi.ts
+ * RTK Query конфигурация: запросы к серверу (http://localhost:8080/api/v1).
+ *
+ * @packageDocumentation
  */
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";

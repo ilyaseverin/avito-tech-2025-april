@@ -1,13 +1,15 @@
 /**
- * @file NotFoundPage.tsx
- * @description Страница 404 "Не найдено".
+ * # NotFoundPage.tsx
+ * Страница 404 "Не найдено".
+ *
+ * @packageDocumentation
  */
 
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 
-const NotFoundPage: React.FC = () => {
+export const NotFoundPage: React.FC = () => {
   return (
     <Box
       sx={{
@@ -30,5 +32,3 @@ const NotFoundPage: React.FC = () => {
     </Box>
   );
 };
-
-export default NotFoundPage;

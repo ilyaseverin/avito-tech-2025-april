@@ -1,6 +1,8 @@
 /**
- * @file IssuesPage.tsx
- * @description Страница со списком всех задач. Поддерживает поиск (дебаунс >= 3 символов), фильтр по статусу, фильтр по названию доски.
+ * # IssuesPage.tsx
+ * Страница со списком всех задач. Поддерживает поиск (дебаунс >= 3 символов), фильтр по статусу, фильтр по названию доски.
+ *
+ * @packageDocumentation
  */
 
 import React, { useState } from "react";
@@ -21,7 +23,7 @@ import TaskModal from "../components/TaskModal";
 import { useDebounce } from "../hooks/useDebounce";
 import IssueCard from "../components/IssueCard";
 
-const IssuesPage: React.FC = () => {
+export const IssuesPage: React.FC = () => {
   const {
     data: tasks,
     isLoading: isLoadingTasks,
@@ -42,7 +44,7 @@ const IssuesPage: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>("Все");
   const [filterBoard, setFilterBoard] = useState<string>("Все");
 
-  // Дебаунсированное значение. Поиск начинается только, если длина строки >= 3 символов
+  // Дебаунс
   const searchText = useDebounce(rawSearchText, 300);
   const navigate = useNavigate();
 
@@ -53,22 +55,23 @@ const IssuesPage: React.FC = () => {
       </Box>
     );
   }
-
   if (isErrorTasks || isErrorBoards || !tasks) {
     return <div>Ошибка при загрузке задач или досок</div>;
   }
 
-  // Фильтрация задач по статусу, названию доски и поисковому запросу
+  // Фильтрация
   const filteredTasks = tasks.filter((task) => {
     const matchesStatus =
       filterStatus === "Все" || task.status === filterStatus;
     const matchesBoard =
       filterBoard === "Все" || task.boardName === filterBoard;
+
     const lowerSearch = searchText.toLowerCase();
     const matchesSearch =
       searchText.length < 3 ||
       task.title.toLowerCase().includes(lowerSearch) ||
       task.assignee.fullName.toLowerCase().includes(lowerSearch);
+
     return matchesStatus && matchesBoard && matchesSearch;
   });
 
@@ -139,7 +142,6 @@ const IssuesPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Вывод списка задач с использованием компонента IssueCard */}
       {filteredTasks.map((task) => (
         <IssueCard key={task.id} task={task} onClick={handleCardClick} />
       ))}
@@ -157,5 +159,3 @@ const IssuesPage: React.FC = () => {
     </Box>
   );
 };
-
-export default IssuesPage;

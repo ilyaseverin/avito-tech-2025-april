@@ -1,3 +1,8 @@
+/**
+ * @file NotFoundPage.tsx
+ * @description Страница 404 "Не найдено".
+ */
+
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";

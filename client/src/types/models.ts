@@ -1,10 +1,12 @@
-// src/types/models.ts
+/**
+ * @file models.ts
+ * @description Общие типы (интерфейсы) для данных, которые возвращает API.
+ */
 
 export type Priority = "Low" | "Medium" | "High";
 export type Status = "Backlog" | "InProgress" | "Done";
 
-// ---------- BOARDS ----------
-/** Ответ при GET /boards */
+/** Boards */
 export interface GetBoardsResponse {
   id: number;
   name: string;
@@ -12,7 +14,7 @@ export interface GetBoardsResponse {
   taskCount: number;
 }
 
-/** Ответ при GET /boards/{boardId} */
+/** GET /boards/{boardId} -> задачи доски */
 export interface GetTasksOnBoardResponse {
   id: number;
   title: string;
@@ -27,8 +29,7 @@ export interface GetTasksOnBoardResponse {
   };
 }
 
-// ---------- TASKS ----------
-/** Ответ при GET /tasks */
+/** GET /tasks */
 export interface GetTasksResponse {
   id: number;
   title: string;
@@ -46,10 +47,7 @@ export interface GetTasksResponse {
   };
 }
 
-/**
- * Ответ при GET /tasks/{taskId}
- * Обратите внимание, что здесь нет boardId, только boardName и assignee
- */
+/** GET /tasks/{taskId} */
 export interface GetTaskByIDResponse {
   id: number;
   title: string;
@@ -65,7 +63,7 @@ export interface GetTaskByIDResponse {
   };
 }
 
-/** Создание задачи (POST /tasks/create) */
+/** Создание задачи */
 export interface CreateTaskRequest {
   title: string;
   description: string;
@@ -77,7 +75,7 @@ export interface CreateTaskResponse {
   id: number;
 }
 
-/** Обновление задачи (PUT /tasks/update/{taskId}) */
+/** Обновление задачи */
 export interface UpdateTaskRequest {
   title: string;
   description: string;
@@ -89,7 +87,7 @@ export interface UpdateTaskResponse {
   message: string;
 }
 
-/** Обновление статуса (PUT /tasks/updateStatus/{taskId}) */
+/** Обновление статуса задачи */
 export interface UpdateTaskStatusRequest {
   status: Status;
 }
@@ -97,8 +95,7 @@ export interface UpdateTaskStatusResponse {
   message: string;
 }
 
-// ---------- USERS ----------
-/** Ответ при GET /users */
+/** Users */
 export interface GetUsersResponse {
   id: number;
   fullName: string;

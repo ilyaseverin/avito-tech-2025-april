@@ -1,12 +1,15 @@
-// types/formTypes.ts
-import type { Priority, Status } from "../types/models";
+/**
+ * @file formTypes.ts
+ * @description Типы для React Hook Form при создании/редактировании задачи.
+ */
 
-// Этот интерфейс описывает все поля, которые будет обрабатывать React Hook Form.
+import type { Priority, Status } from "./models";
+
 export interface TaskFormData {
   title: string;
   description: string;
   priority: Priority;
-  status: Status; // В режиме редактирования обязательное поле
-  boardValue: string; // ID доски в строковом формате
-  assigneeValue: string; // ID исполнителя в строковом формате
+  status: Status; // при редактировании
+  boardValue: string;
+  assigneeValue: string;
 }

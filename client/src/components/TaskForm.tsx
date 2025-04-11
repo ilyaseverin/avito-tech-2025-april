@@ -1,3 +1,8 @@
+/**
+ * @file TaskForm.tsx
+ * @description Универсальная форма для создания / редактирования задачи, использует React Hook Form.
+ */
+
 import React from "react";
 import {
   TextField,
@@ -27,7 +32,7 @@ interface TaskFormProps {
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   priority: Priority;
   setPriority: React.Dispatch<React.SetStateAction<Priority>>;
-  status?: Status; // может быть undefined, если форма на создание
+  status?: Status;
   setStatus?: React.Dispatch<React.SetStateAction<Status>>;
   boardValue: string;
   setBoardValue: React.Dispatch<React.SetStateAction<string>>;
@@ -42,7 +47,6 @@ interface TaskFormProps {
   users?: User[];
   usersLoading: boolean;
 
-  // Пропсы от RHF
   register: UseFormRegister<TaskFormData>;
   errors: FieldErrors<TaskFormData>;
 }
@@ -71,7 +75,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
 }) => {
   return (
     <>
-      {/* Название задачи */}
       <TextField
         label="Название задачи"
         fullWidth
@@ -82,11 +85,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
           onChange: (e) => setTitle(e.target.value),
         })}
         value={title}
-        error={!!errors.title} // если есть ошибка, поле подсвечивается
+        error={!!errors.title}
         helperText={errors.title?.message}
       />
 
-      {/* Описание задачи */}
       <TextField
         label="Описание задачи"
         fullWidth
@@ -103,7 +105,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
         helperText={errors.description?.message}
       />
 
-      {/* Проект (Доска) */}
       <FormControl
         fullWidth
         margin="normal"
@@ -137,7 +138,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
         </p>
       )}
 
-      {/* Приоритет */}
       <FormControl fullWidth margin="normal" error={!!errors.priority}>
         <InputLabel id="priority-label">Приоритет</InputLabel>
         <Select
@@ -158,7 +158,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <p style={{ color: "red", marginTop: 4 }}>{errors.priority.message}</p>
       )}
 
-      {/* Статус — только при редактировании */}
       {isEditMode && status && setStatus && (
         <FormControl fullWidth margin="normal" error={!!errors.status}>
           <InputLabel id="status-label">Статус</InputLabel>
@@ -181,7 +180,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <p style={{ color: "red", marginTop: 4 }}>{errors.status.message}</p>
       )}
 
-      {/* Исполнитель */}
       <FormControl
         fullWidth
         margin="normal"

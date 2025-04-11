@@ -1,4 +1,7 @@
-// src/main.tsx
+/**
+ * @file main.tsx
+ * @description Точка входа в React-приложение. Подключаем Redux, MUI, Router.
+ */
 
 import React from "react";
 import ReactDOM from "react-dom/client";

@@ -1,3 +1,8 @@
+/**
+ * @file App.tsx
+ * @description Корневой компонент приложения: роутинг по страницам.
+ */
+
 import { Routes, Route } from "react-router-dom";
 import { Container } from "@mui/material";
 

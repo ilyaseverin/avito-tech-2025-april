@@ -1,4 +1,7 @@
-// src/components/Header.tsx
+/**
+ * @file Header.tsx
+ * @description Верхняя панель с вкладками навигации (Доски / Все задачи) + кнопка "Создать задачу".
+ */
 
 import React, { useState } from "react";
 import { AppBar, Toolbar, Button, Box, Tabs, Tab } from "@mui/material";
@@ -9,8 +12,6 @@ const Header: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const location = useLocation();
 
-  // Определяем активную вкладку: если путь начинается с /issues – это вкладка "Все задачи",
-  // если с /boards или /board/ – вкладка "Доски".
   let currentTab = "";
   if (location.pathname.startsWith("/issues")) {
     currentTab = "/issues";
@@ -25,11 +26,15 @@ const Header: React.FC = () => {
     <>
       <AppBar position="sticky">
         <Toolbar>
-          {/* Вкладки размещены слева */}
           <Tabs
             value={currentTab}
             textColor="inherit"
             indicatorColor="secondary"
+            sx={{
+              "& .MuiTabs-indicator": { backgroundColor: "white" },
+              "& .MuiTab-root": { color: "white" },
+              "& .Mui-selected": { color: "white" },
+            }}
           >
             <Tab label="Доски" value="/boards" component={Link} to="/boards" />
             <Tab
@@ -39,8 +44,7 @@ const Header: React.FC = () => {
               to="/issues"
             />
           </Tabs>
-          <Box sx={{ flexGrow: 1 }} /> {/* Растягивающийся spacer */}
-          {/* Кнопка создания задачи остается справа */}
+          <Box sx={{ flexGrow: 1 }} />
           <Button
             variant="contained"
             color="info"
@@ -51,12 +55,10 @@ const Header: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Модальное окно для создания задачи */}
       {openModal && (
         <TaskModal
           open={openModal}
           onClose={() => setOpenModal(false)}
-          // Если вы на странице доски, можно передать defaultBoardId здесь
           isBoardLocked={false}
           showGoToBoardButton={false}
         />

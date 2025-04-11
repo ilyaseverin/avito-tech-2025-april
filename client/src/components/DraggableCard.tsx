@@ -1,6 +1,10 @@
-// src/components/DraggableCard.tsx
+/**
+ * @file DraggableCard.tsx
+ * @description Одиночная задача-карточка, которую можно перетаскивать (Drag & Drop).
+ */
+
 import React from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, CardActionArea } from "@mui/material";
 import type { GetTasksOnBoardResponse } from "../types/models";
 
 interface DraggableCardProps {
@@ -20,13 +24,29 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ task, onCardClick }) => {
     <Card
       draggable
       onDragStart={handleDragStart}
-      sx={{ mb: 2, cursor: "pointer" }}
-      onClick={() => onCardClick(task)}
+      sx={{
+        mb: 2,
+        borderRadius: 2,
+        boxShadow: 2,
+        transition: "box-shadow 0.3s ease-in-out",
+        ":hover": {
+          boxShadow: 6,
+        },
+      }}
     >
-      <CardContent>
-        <Typography variant="h6">{task.title}</Typography>
-        <Typography variant="body2">{task.description}</Typography>
-      </CardContent>
+      <CardActionArea onClick={() => onCardClick(task)}>
+        <CardContent sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            {task.title}
+          </Typography>
+          <Typography variant="body2" paragraph>
+            {task.description}
+          </Typography>
+          <Typography variant="subtitle2" color="text.secondary">
+            Исполнитель: {task.assignee.fullName}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
     </Card>
   );
 };

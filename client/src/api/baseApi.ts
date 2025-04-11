@@ -1,4 +1,7 @@
-// src/api/baseApi.ts
+/**
+ * @file baseApi.ts
+ * @description RTK Query конфигурация: запросы к серверу (http://localhost:8080/api/v1).
+ */
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
@@ -18,11 +21,11 @@ import type {
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080/api/v1", // ваш сервер
+    baseUrl: "http://localhost:8080/api/v1",
   }),
   tagTypes: ["Boards", "Tasks", "Users"],
   endpoints: (builder) => ({
-    // ----------------- Boards -----------------
+    // ------ Boards ------
     getBoards: builder.query<GetBoardsResponse[], void>({
       query: () => "/boards",
       transformResponse: (raw: { data: GetBoardsResponse[] }) => raw.data,
@@ -36,8 +39,7 @@ export const baseApi = createApi({
       providesTags: ["Tasks"],
     }),
 
-    // ----------------- Tasks ------------------
-    /** Все задачи (GET /tasks) */
+    // ------ Tasks ------
     getAllTasks: builder.query<GetTasksResponse[], void>({
       query: () => "/tasks",
       transformResponse: (raw: { data: GetTasksResponse[] }) => raw.data,
@@ -99,7 +101,7 @@ export const baseApi = createApi({
       ],
     }),
 
-    // ----------------- Users ------------------
+    // ------ Users ------
     getUsers: builder.query<GetUsersResponse[], void>({
       query: () => "/users",
       transformResponse: (raw: { data: GetUsersResponse[] }) => raw.data,

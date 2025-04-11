@@ -1,21 +1,24 @@
-// src/hooks/useTaskDraft.ts
+/**
+ * @file useTaskDraft.ts
+ * @description Хук для сохранения черновика задачи в localStorage.
+ */
+
 import { useState, useEffect } from "react";
-import type { Priority } from "../types/models"; // Импортируйте тип Priority
+import type { Priority } from "../types/models";
 
 export interface TaskDraft {
   title: string;
   description: string;
-  priority: Priority; // изменено с string на Priority
+  priority: Priority;
   boardValue: string;
   assigneeValue: string;
 }
 
 /**
- * Хук useTaskDraft сохраняет и считывает данные черновика из localStorage с заданным ключом.
- *
- * @param key - ключ для хранения
- * @param initialValue - начальное значение
- * @returns Объект с текущим значением, функцией обновления и функцией очистки
+ * Хук useTaskDraft сохраняет / читает из localStorage черновик задачи
+ * @param key ключ хранения
+ * @param initialValue начальное значение
+ * @returns { draft, setDraft, clearDraft }
  */
 export function useTaskDraft(
   key: string,

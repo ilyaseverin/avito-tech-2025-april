@@ -1,4 +1,8 @@
-// src/components/Columns.tsx
+/**
+ * @file Columns.tsx
+ * @description Компонент для отображения задач в колонках (Backlog, InProgress, Done).
+ */
+
 import React, { useState, useCallback } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import DraggableCard from "./DraggableCard";

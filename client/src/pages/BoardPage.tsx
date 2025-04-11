@@ -1,7 +1,11 @@
-// src/pages/Board/BoardPage.tsx
+/**
+ * @file BoardPage.tsx
+ * @description Страница конкретной доски (Backlog, InProgress, Done) с Drag & Drop.
+ */
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import {
   useGetBoardTasksQuery,
   useGetBoardsQuery,
@@ -15,22 +19,36 @@ const BoardPage: React.FC = () => {
   const { id } = useParams();
   const boardId = Number(id);
 
-  // Загружаем задачи доски и список всех досок
-  const { data: tasks, isLoading, isError } = useGetBoardTasksQuery(boardId);
-  const { data: allBoards } = useGetBoardsQuery();
+  // Запросы на задачи доски и список досок
+  const {
+    data: tasks,
+    isLoading: isLoadingTasks,
+    isError: isErrorTasks,
+  } = useGetBoardTasksQuery(boardId);
+  const {
+    data: allBoards,
+    isLoading: isLoadingBoards,
+    isError: isErrorBoards,
+  } = useGetBoardsQuery();
 
   const [editTask, setEditTask] = useState<GetTasksOnBoardResponse | null>(
     null
   );
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
-  if (isLoading) return <div>Загрузка задач доски...</div>;
-  if (isError) return <div>Ошибка при загрузке задач доски</div>;
-  if (!tasks) return null;
+  if (isLoadingTasks || isLoadingBoards) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  if (isErrorTasks || isErrorBoards || !tasks) {
+    return <div>Ошибка при загрузке задач или досок</div>;
+  }
 
   const thisBoard = allBoards?.find((b) => b.id === boardId);
 
-  // Фильтрация задач по статусам
   const backlog = tasks.filter((t) => t.status === "Backlog");
   const inProgress = tasks.filter((t) => t.status === "InProgress");
   const done = tasks.filter((t) => t.status === "Done");

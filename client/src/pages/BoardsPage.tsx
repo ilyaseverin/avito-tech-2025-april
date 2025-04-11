@@ -1,15 +1,33 @@
-// src/pages/Boards/BoardsPage.tsx
+/**
+ * @file BoardsPage.tsx
+ * @description Страница со списком всех досок. При нажатии — переход на конкретную доску.
+ */
 
 import React from "react";
-import { Box, Card, CardContent, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { useGetBoardsQuery } from "../api/baseApi";
 
 const BoardsPage: React.FC = () => {
   const { data: boards, isLoading, isError } = useGetBoardsQuery();
 
-  if (isLoading) return <div>Загрузка списка досок...</div>;
-  if (isError) return <div>Ошибка при загрузке досок</div>;
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  if (isError || !boards) {
+    return <div>Ошибка при загрузке досок</div>;
+  }
 
   return (
     <Box sx={{ p: 2 }}>
@@ -17,7 +35,7 @@ const BoardsPage: React.FC = () => {
         Все доски
       </Typography>
 
-      {boards?.map((board) => (
+      {boards.map((board) => (
         <Card key={board.id} sx={{ mb: 2 }}>
           <CardContent>
             <Box sx={{ display: "flex", alignItems: "center" }}>

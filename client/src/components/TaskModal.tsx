@@ -1,5 +1,16 @@
+/**
+ * @file TaskModal.tsx
+ * @description Модальное окно для создания / редактирования задачи. Поддерживает черновик.
+ */
+
 import React, { useEffect, useState, useMemo } from "react";
-import { Modal, Box, Button, Typography } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import {
   useCreateTaskMutation,
   useUpdateTaskMutation,
@@ -41,7 +52,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
 }) => {
   const isEditMode = Boolean(taskId);
 
-  // Мемоизируем изначальный draft (черновик):
   const initialDraft = useMemo<TaskDraft>(
     () => ({
       title: "",
@@ -58,7 +68,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     initialDraft
   );
 
-  // Локальные стейты (как было)
+  // Локальные состояния
   const [title, setTitle] = useState(isEditMode ? "" : draft.title);
   const [description, setDescription] = useState(
     isEditMode ? "" : draft.description
@@ -78,15 +88,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
     isEditMode ? "" : draft.assigneeValue
   );
 
-  // Данные с сервера
-  const { data: fetchedTask } = useGetTaskByIdQuery(taskId!, { skip: !taskId });
+  const { data: fetchedTask, isLoading: isTaskLoading } = useGetTaskByIdQuery(
+    taskId!,
+    { skip: !taskId }
+  );
   const { data: boards, isLoading: boardsLoading } = useGetBoardsQuery();
   const { data: users, isLoading: usersLoading } = useGetUsersQuery();
 
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
 
-  // Заполняем поля из API при редактировании
+  // Загрузка данных при редактировании
   useEffect(() => {
     if (isEditMode && fetchedTask) {
       setTitle(fetchedTask.title);
@@ -106,12 +118,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
         setBoardValue("");
       }
     } else if (!isEditMode && defaultBoardId) {
-      // Создание: если есть defaultBoardId, выставляем его
       setBoardValue(defaultBoardId.toString());
     }
   }, [isEditMode, fetchedTask, defaultBoardId, forcedBoardId, boards]);
 
-  // Сохраняем в черновик при создании задачи
+  // Сохранение в черновик при создании
   useEffect(() => {
     if (!isEditMode) {
       const newDraft: TaskDraft = {
@@ -136,7 +147,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     setDraft,
   ]);
 
-  // Проверка валидности boardValue / assigneeValue — если недоступно в списке, сбрасываем
+  // Проверяем, что boardValue / assigneeValue доступны
   useEffect(() => {
     if (!isEditMode) {
       if (boards && boards.length > 0 && boardValue) {
@@ -154,11 +165,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
     }
   }, [isEditMode, boards, boardValue, users, assigneeValue]);
 
-  // ========================
-  //   React Hook Form setup
-  // ========================
+  // ----- React Hook Form -----
   const methods = useForm<TaskFormData>({
-    mode: "onSubmit", // ошибки появляются только при сабмите
+    mode: "onSubmit",
     defaultValues: {
       title,
       description,
@@ -168,9 +177,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
       assigneeValue,
     },
   });
-
-  // При изменении локальных стейтов подчищаем formValues,
-  // чтобы валидация не считала предзаполненные поля пустыми
   const {
     reset,
     handleSubmit,
@@ -188,14 +194,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
     });
   }, [title, description, priority, status, boardValue, assigneeValue, reset]);
 
-  // Функция для отправки формы
   const onSubmit = async () => {
     const boardIdNum = boardValue ? parseInt(boardValue) : 0;
     const assigneeIdNum = assigneeValue ? parseInt(assigneeValue) : 0;
-
     try {
       if (isEditMode && taskId) {
-        // Редактирование
         const payload: UpdateTaskRequest = {
           title,
           description,
@@ -205,7 +208,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
         };
         await updateTask({ taskId, data: payload }).unwrap();
       } else {
-        // Создание
         if (!boardIdNum) {
           console.warn("Не выбран проект (boardId)!");
           return;
@@ -218,7 +220,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           assigneeId: assigneeIdNum,
         };
         await createTask(payload).unwrap();
-        clearDraft(); // очистка черновика
+        clearDraft();
       }
       onClose();
     } catch (error) {
@@ -226,7 +228,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
     }
   };
 
-  // Кнопка "Перейти на доску"
   const handleGoToBoard = () => {
     if (onGoToBoard && boardValue) {
       onGoToBoard(parseInt(boardValue));
@@ -249,61 +250,70 @@ const TaskModal: React.FC<TaskModalProps> = ({
     p: 4,
   };
 
+  // Если идёт загрузка информации о задаче (в режиме редактирования)
+  if (isEditMode && isTaskLoading) {
+    return (
+      <Modal open={open} onClose={onClose}>
+        <Box sx={{ ...style, display: "flex", justifyContent: "center" }}>
+          <CircularProgress />
+        </Box>
+      </Modal>
+    );
+  }
+
   return (
     <Modal open={open} onClose={onClose}>
-      <FormProvider {...methods}>
-        <Box component="form" sx={style} onSubmit={handleSubmit(onSubmit)}>
-          <Typography variant="h6" gutterBottom>
-            {modalTitle}
-          </Typography>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormProvider {...methods}>
+          <Box sx={style}>
+            <Typography variant="h6" gutterBottom>
+              {modalTitle}
+            </Typography>
 
-          {/* Вызов вынесенной формы */}
-          <TaskForm
-            title={title}
-            setTitle={setTitle}
-            description={description}
-            setDescription={setDescription}
-            priority={priority}
-            setPriority={setPriority}
-            status={status}
-            setStatus={setStatus}
-            boardValue={boardValue}
-            setBoardValue={setBoardValue}
-            assigneeValue={assigneeValue}
-            setAssigneeValue={setAssigneeValue}
-            isEditMode={isEditMode}
-            isBoardLocked={isBoardLocked}
-            boards={boards}
-            boardsLoading={boardsLoading}
-            users={users}
-            usersLoading={usersLoading}
-            register={methods.register}
-            errors={errors}
-          />
+            <TaskForm
+              title={title}
+              setTitle={setTitle}
+              description={description}
+              setDescription={setDescription}
+              priority={priority}
+              setPriority={setPriority}
+              status={status}
+              setStatus={setStatus}
+              boardValue={boardValue}
+              setBoardValue={setBoardValue}
+              assigneeValue={assigneeValue}
+              setAssigneeValue={setAssigneeValue}
+              isEditMode={isEditMode}
+              isBoardLocked={isBoardLocked}
+              boards={boards}
+              boardsLoading={boardsLoading}
+              users={users}
+              usersLoading={usersLoading}
+              register={methods.register}
+              errors={errors}
+            />
 
-          {/* Кнопка "Перейти на доску", если нужно */}
-
-          {/* Кнопки "Создать/Обновить" и "Отмена" */}
-          <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={isCreating || isUpdating}
-            >
-              {isEditMode ? "Обновить" : "Создать"}
-            </Button>
-            <Button variant="outlined" onClick={onClose}>
-              Отмена
-            </Button>
-            <Box sx={{ flexGrow: 1 }} />
-            {showGoToBoardButton && boardValue && (
-              <Button variant="outlined" onClick={handleGoToBoard}>
-                Перейти на доску
+            <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={isCreating || isUpdating}
+              >
+                {isEditMode ? "Обновить" : "Создать"}
               </Button>
-            )}
+              <Button variant="outlined" onClick={onClose}>
+                Отмена
+              </Button>
+              <Box sx={{ flexGrow: 1 }} />
+              {showGoToBoardButton && boardValue && (
+                <Button variant="outlined" onClick={handleGoToBoard}>
+                  Перейти на доску
+                </Button>
+              )}
+            </Box>
           </Box>
-        </Box>
-      </FormProvider>
+        </FormProvider>
+      </form>
     </Modal>
   );
 };
